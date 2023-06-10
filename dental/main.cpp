@@ -3,6 +3,8 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <functional>
+#include <ctime>
 using namespace std;
 
 template<typename T>
@@ -60,15 +62,15 @@ const int MAXID= 10;
 struct Cliente{
 	int		id;
 	char	nombre[MAXNOM], apellido[MAXNOM];
-//	Cliente(int dni): id(dni){}
-
-	static void encabezados(ostream &salida){
-		salida<<right<<setw(MAXID)<<"DNI  "<<' ';
-		salida<<left<<setw(MAXNOM- 1)<<"  NOMBRE";
-		salida<<' '<<setw(MAXNOM- 1)<<"  APELLIDO";
-		salida<<'\n';
-	}
+	static void encabezados(ostream &salida);
 };
+
+void Cliente::encabezados(ostream &salida){
+	salida<<right<<setw(MAXID)<<"DNI  "<<' ';
+	salida<<left<<setw(MAXNOM- 1)<<"  NOMBRE";
+	salida<<' '<<setw(MAXNOM- 1)<<"  APELLIDO";
+	salida<<'\n';
+}
 
 void tabular(ostream &salida, const Cliente &cli){
 	salida<<right<<setw(MAXID)<<cli.id<<' ';
@@ -76,9 +78,105 @@ void tabular(ostream &salida, const Cliente &cli){
 	salida<<setw(MAXNOM-1)<<cli.apellido<<'\n';
 }
 
+void escribir(const Cliente &cli){
+	escribirln("DNI     : ", cli.id);
+	escribirln("Nombre  : ", cli.nombre);
+	escribirln("Apellido: ", cli.apellido);
+}
+
+void leer_id(Cliente &cliente){
+	leer("DNI     : ", cliente.id);
+}
+
 void leer(Cliente &cliente){
 	leer("Nombre  : ", cliente.nombre, MAXNOM);
 	leer("Apellido: ", cliente.apellido, MAXNOM);
+}
+
+class Fecha{
+	friend ostream &operator<<(ostream &salida, const Fecha &fecha);
+	friend istream &operator>>(istream &entrada, Fecha &fecha);
+public:
+	Fecha(): tiempo(time(nullptr)){}
+
+	bool operator<(Fecha derecha) const{
+		return tiempo< derecha.tiempo;
+	}
+
+	bool operator<=(Fecha derecha) const{
+		return tiempo<= derecha.tiempo;
+	}
+private:
+	time_t	tiempo;
+};
+
+ostream &operator<<(ostream &salida, const Fecha &fecha){
+	tm *info= localtime(&fecha.tiempo);
+	char fillChar= salida.fill('0');
+	salida<<setw(2)<<right<<info->tm_mday<<'/';
+	salida<<setw(2)<<info->tm_mon+ 1<<'/';
+	salida<<info->tm_year+ 1900<<' ';
+	salida<<setw(2)<<info->tm_hour<<':';
+	salida<<setw(2)<<info->tm_min<<':';
+	salida<<setw(2)<<info->tm_sec;
+	return salida<<setfill(fillChar);
+}
+
+istream &operator>>(istream &entrada, Fecha &fecha){
+	char sep;
+	tm *info= localtime(&fecha.tiempo);
+	entrada>>info->tm_mday>>sep>>info->tm_mon;
+	entrada>>sep>>info->tm_year;
+	if(info->tm_mon< 1 || info->tm_mon> 12){
+		entrada.setstate(ios::failbit);
+		return entrada;
+	}
+	int diasMes;
+	switch(info->tm_mon){
+		case 4: case 6: case 9: case 11:
+		diasMes= 30;
+		break;
+		case 2:
+		//Un año es bisiesto en el calendario
+		//Gregoriano, si es divisible entre 4 
+		//y no divisible entre 100, y también
+		//si es divisible entre 400.
+		if(info->tm_year% 400== 0) diasMes= 29;
+		else if(info->tm_year% 100 == 0) diasMes= 28;
+		else if(info->tm_year% 4 == 0) diasMes= 29;
+		else diasMes= 28;
+		break;
+		default:
+		diasMes= 31;
+	}
+	if(info->tm_mday< 1 || info->tm_mday> diasMes){
+		entrada.setstate(ios::failbit);
+		return entrada;
+	}
+	entrada>>info->tm_hour>>sep>>info->tm_min;
+	entrada>>sep>>info->tm_sec;
+	if(info->tm_hour< 0 || info->tm_hour> 23){
+		entrada.setstate(ios::failbit);
+		return entrada;
+	}
+	if(info->tm_min< 0 || info->tm_min> 59){
+		entrada.setstate(ios::failbit);
+		return entrada;
+	}
+	if(info->tm_sec< 0 || info->tm_sec> 59){
+		entrada.setstate(ios::failbit);
+		return entrada;
+	}
+	info->tm_year-= 1900;
+	info->tm_mon-= 1;
+	time_t tiempo= mktime(info);
+	if(tiempo== -1){
+		entrada.setstate(ios::failbit);
+	}
+	else{
+		fecha.tiempo= tiempo;
+	}
+	return entrada;
 }
 
 template<typename K, typename T>
@@ -158,32 +256,11 @@ private:
 	}
 };
 
-void escribir(const Cliente &cli){
-	escribirln("DNI     : ", cli.id);
-	escribirln("Nombre  : ", cli.nombre);
-	escribirln("Apellido: ", cli.apellido);
-}
-
 int main(){
-	escribirln("Hola mundo");
-	int dato;
-	leer("ingrese un entero: ", dato);
-	escribirln("Valor leido: ", dato);
-	string cadena;
-	leer("ingrese una cadena: ", cadena);
-	escribirln("cadena leida: ", cadena);
-	Cliente cliente;
-	cliente.id= 4882980;
-	leer(cliente);
-	Cliente::encabezados(cout);
-	tabular(cout, cliente);
-	escribir(cliente);
-	Admin<int, Cliente> admin("clientes.dat");
-	bool ok= admin.guardarNuevo(cliente);
-	cout<<"guardado: "<<ok<<'\n';
-	cliente.id= 0;
-	ok= admin.leer(4882980, cliente);
-	cout<<"leido: "<<ok<<'\n';
-	escribir(cliente);
+	Fecha actual;
+	escribirln("Fecha actual: ", actual);
+	Fecha fecha;
+	leer("Ingrese una fecha: ", fecha);
+	escribirln("Fecha leida: ", fecha);
 	return 0;
 }

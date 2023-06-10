@@ -11,3 +11,6 @@ run: $(BIN)
 
 $(BIN): $(OBJECTS)
 	$(CXX) $^ -o $@
+
+clean:
+	$(RM) $(OBJECTS) $(BIN)
