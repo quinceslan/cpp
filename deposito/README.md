@@ -1,4 +1,4 @@
-## Ejercicio 78
+## Depositos
 Una empresa tiene cuatro depositos, donde almacenan los articulos fabricados, los cuales son diez, que son vendidos por sus doce jefes de ventas.
 
 Por cada venta realizada se registra la siguiente informacion:
