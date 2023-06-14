@@ -56,6 +56,22 @@ void leer(const string &e, char *cad, unsigned n){
 	}while(true);
 }
 
+void mostrar_mensaje(const string &mensaje){
+	escribirln(mensaje);
+	while(cin.get()!= '\n');
+}
+
+bool confirmar(string mensaje){
+	int opcion;
+	mensaje+= "\n   1. Si   2. No\nOpcion: ";
+	do{
+		leer(mensaje, opcion);
+		if(opcion == 1 || opcion== 2) break;
+		escribirln("Escoja si (1) o no (2)\n");
+	}while(true);
+	return opcion== 1;
+}
+
 const int MAXNOM= 15;
 const int MAXID= 10;
 
@@ -189,44 +205,35 @@ public:
 	bool guardarNuevo(const T &reg){
 		if(index.find(reg.id)!= index.end())
 			return false;
-		ofstream sal(fichero, ios::app|ios::binary);
-		if(!sal.is_open()){
-			string error= "Error al abrir '"+ fichero;
-			error+= "' para agregar datos";
-			throw logic_error(error);
+		ofstream salida;
+		abrirParaAgregar(salida);
+		streampos pos= salida.tellp();
+		salida.write((const char*)&reg, sizeof(T));
+		salida.flush();
+		if(salida.good()){
+			index.emplace(reg.id, pos);
+			return true;
 		}
-		streampos pos= sal.tellp();
-		sal.write((const char*)&reg, sizeof(T));
-		sal.flush();
-		index.emplace(reg.id, pos);
-		return sal.good();
+		return false;
 	}
 
 	bool leer(K id, T &reg){
 		auto it= index.find(id);
 		if(it== index.end()) return false;
-		ifstream in(fichero, ios::binary);
-		if(!in.is_open()){
-			string error= "Error al abrir '"+ fichero;
-			error+= "' para leer datos";
-			throw logic_error(error);
-		}
-		in.seekg(it->second);
-		in.read((char*)&reg, sizeof(T));
-		return in.good();
+		ifstream entrada;
+		abrirParaLeer(entrada);
+		entrada.seekg(it->second);
+		entrada.read((char*)&reg, sizeof(T));
+		return entrada.good();
 	}
 
 	template<typename Contenedor>
 	void leerSi(function<bool(const T&)> pred,
 			Contenedor &c){
-		ifstream in(fichero, ios::binary);
-		if(!in.is_open()){
-			string error= "Error al abrir '"+ fichero;
-			error+= "' para lectura";
-			throw logic_error(error);
-		}
+		ifstream entrada;
+		abrirParaLeer(entrada);
 		T reg;
-		while(in.read((char*)&reg, sizeof(T))){
+		while(entrada.read((char*)&reg, sizeof(T))){
 			if(pred(reg)) c.push_back(reg);
 		}
 	}
@@ -235,7 +242,7 @@ private:
 	map<int, streampos>	index;
 
 	void construirIndice(){
-		ifstream entrada(fichero);
+		ifstream entrada(fichero, ios::binary);
 		if(entrada.is_open()){
 			T reg;
 			streampos pos= 0;
@@ -246,21 +253,74 @@ private:
 			}
 		}
 		else{
-			ofstream salida(fichero, ios::app);
-			if(!salida.is_open()){
-				string error= "No se puede crear ";
-				error+= fichero+ " para escritura";
-				throw logic_error(error);
-			}
+			//fichero no existe, procedemos a crearlo
+			ofstream salida;
+			abrirParaAgregar(salida);
+		}
+	}
+
+	void abrirParaLeer(ifstream &entrada){
+		entrada.open(fichero, ios::binary);
+		if(!entrada.is_open()){
+			string error= "Error al abrir '"+ fichero;
+			error+= "' para lectura";
+			throw logic_error(error);
+		}
+	}
+
+	void abrirParaAgregar(ofstream &salida){
+		salida.open(fichero, ios::app | ios::binary);
+		if(!salida.is_open()){
+			string error= "Error al abrir '"+ fichero;
+			error+= "' para escribir a agregar datos";
+			throw logic_error(error);
 		}
 	}
 };
 
+class Aplicacion{
+public:
+	Aplicacion()
+		: clientes("clientes.dat"){}
+
+	void agregar_cliente(){
+		Cliente cliente;
+		leer_id(cliente);
+		agregar(cliente.id, clientes);
+	}
+private:
+	template<typename K, typename T>
+	void agregar(K id, Admin<K, T> &admin){
+		T reg;
+		if(admin.leer(id, reg)){
+			string mensaje= to_string(reg.id);
+			mensaje+= " ya registrado, intente de nuevo.";
+			mostrar_mensaje(mensaje);
+			return;
+		}
+		leer(reg);
+		if(confirmar("Guardar nuevo registro?")){
+			if(admin.guardarNuevo(reg))
+				mostrar_mensaje("Guardado exitosamente.");
+			else
+				mostrar_mensaje("Error al guardar registro.");
+		}
+		else
+			mostrar_mensaje("No se han hecho cambios.");
+	}
+
+	Admin<int, Cliente> clientes;
+};
+
 int main(){
+	/*
 	Fecha actual;
 	escribirln("Fecha actual: ", actual);
 	Fecha fecha;
 	leer("Ingrese una fecha: ", fecha);
 	escribirln("Fecha leida: ", fecha);
+	*/
+	Aplicacion app;
+	app.agregar_cliente();
 	return 0;
 }
