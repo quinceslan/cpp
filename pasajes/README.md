@@ -13,29 +13,16 @@ Octavio Paz compro la silla 3 en la fila 5.
 3. Dado el nombre de una persona, decir la ubicación de su silla, por ejemplo si tiene el nombre Octavio Paz se debe decir que compró la silla 3 de la fila 5.
 4. Mostrar la información de todos los pasajeros en un solo mensaje de texto.
 
-
-|Jueanito      |Consuleo     Jair
-|Yepes         |Ramirez      Velasco
-|12345678      |12345678     123456788
-|              |
-|JAvier        |                                              Luis
-|Vasques       |                                              Carvajal
-|12345678      |                                              34902145
-|              |
-|Sara          |                           Francisco
-|Mazuera       |                            Cruz
-|123456789     |                           15678902
-|              |
-|              |
-|              |
-|              |
-|Susan         |              Octavio       Estefany
-|Valencia      |              Paz           Paz
-|16990987      |              134567        3456780
-
-
-
-
-                                                            Maricruz
-                                                            Pineda
-                                                            23456789
+    ---------------------------------------------------------------------
+    |Juanito       |Consuleo     |Jair        |            |            |
+    |Yepes         |Ramirez      |Velasco     |            |            |
+    |12345678      |12345678     |123456788   |            |            |
+    ---------------------------------------------------------------------
+    |JAvier        |             |            |            |Luis        |
+    |Vasques       |             |            |            |Carvajal    |
+    |12345678      |             |            |            |34902145    |
+    ---------------------------------------------------------------------
+    |Sara          |             |            |Francisco   |            |
+    |Mazuera       |             |            |Cruz        |            |
+    |123456789     |             |            |15678902    |            |
+    ---------------------------------------------------------------------
