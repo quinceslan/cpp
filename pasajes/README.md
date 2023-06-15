@@ -13,12 +13,14 @@ Octavio Paz compro la silla 3 en la fila 5.
 3. Dado el nombre de una persona, decir la ubicación de su silla, por ejemplo si tiene el nombre Octavio Paz se debe decir que compró la silla 3 de la fila 5.
 4. Mostrar la información de todos los pasajeros en un solo mensaje de texto.
 
+....
+
     ---------------------------------------------------------------------
     |Juanito       |Consuleo     |Jair        |            |            |
     |Yepes         |Ramirez      |Velasco     |            |            |
     |12345678      |12345678     |123456788   |            |            |
     ---------------------------------------------------------------------
-    |JAvier        |             |            |            |Luis        |
+    |Javier        |             |            |            |Luis        |
     |Vasques       |             |            |            |Carvajal    |
     |12345678      |             |            |            |34902145    |
     ---------------------------------------------------------------------
@@ -26,3 +28,4 @@ Octavio Paz compro la silla 3 en la fila 5.
     |Mazuera       |             |            |Cruz        |            |
     |123456789     |             |            |15678902    |            |
     ---------------------------------------------------------------------
+....
