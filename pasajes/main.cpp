@@ -44,6 +44,15 @@ void registrar_pasajero(Asiento &asiento){
 	leer("Identificacion: ", asiento.identificacion);
 }
 
+string to_string(const Asiento &asiento){
+	string cadena= "----------------------------\n";
+	cadena+= "Nombre  : "+ asiento.nombre+ "\n";
+	cadena+= "Apellido: "+ asiento.apellido+ "\n";
+	cadena+= "Cedula  : "+ to_string(asiento.identificacion)+ "\n";
+	cadena+= "----------------------------";
+	return cadena;
+}
+
 const unsigned NUMFIL = 10;
 const unsigned NUMCOL = 5;
 using Moneda = unsigned long;
@@ -136,6 +145,67 @@ void mostrar_resumen_asientos(const Vuelo &vuelo){
 	mostrar_mensaje("Contenido del vuelo mostrado.");
 }
 
+void listar_pasajeros_alfabeticamente(const Vuelo &vuelo){
+	const string *nombres[NUMFIL* NUMCOL];
+	int contador= 0;
+	for(unsigned i= 0; i< NUMFIL; ++i){
+		for(unsigned j= 0; j< NUMCOL; ++j){
+			if(vuelo.asientos[i][j].libre== false){
+				nombres[contador]= &vuelo.asientos[i][j].nombre;
+				contador+= 1;
+			}
+		}
+	}
+	if(contador == 0){
+		mostrar_mensaje("No hay passajeros registrados.");
+		return;
+	}
+	for(int i= 0; i< contador- 1; ++i){
+		for(int j= i+ 1; j< contador; ++j){
+			if(*nombres[j] < *nombres[i]){
+				std::swap(nombres[i], nombres[j]);
+			}
+		}
+	}
+	string mensaje= "    Lista de pasajeros:\n";
+	for(int i= 0; i< contador; ++i){
+		mensaje+= " -> "+ *nombres[i];
+	}
+	mostrar_mensaje(mensaje);
+}
+
+void mostrar_informacion_silla(const Vuelo &vuelo){
+	cout<<"     Ingrese los datos necesarios para la consulta:\n\n";
+	unsigned fil, col;
+	leer("Ingrese fila       : ", fil);
+	leer("Ingrese No. asiento: ", col);
+	if(fil>= NUMFIL || col>= NUMCOL){
+		mostrar_mensaje("El asiento buscado no pertenece al vuelo.");
+		return;
+	}
+	if(vuelo.asientos[fil][col].libre){
+		mostrar_mensaje("El asiento buscado esta libre.");
+		return;
+	}
+	mostrar_mensaje("Informacion del asiento:\n"+ to_string(vuelo.asientos[fil][col]));
+}
+
+void cancelar_tiquete_por_cedula(Vuelo &vuelo){
+	cout<<"     Cancelar tiquete por cedula\n\n";
+	int cedula;
+	leer("Ingrese No. de cedula: ", cedula);
+	for(unsigned i= 0; i< NUMFIL; ++i){
+		for(unsigned j= 0; j< NUMCOL; ++j){
+			if(vuelo.asientos[i][j].identificacion== cedula){
+				vuelo.asientos[i][j]= Asiento{};
+				mostrar_mensaje("Tiquete cancelado exitosamente.");
+				return;
+			}
+		}
+	}
+	mostrar_mensaje(to_string(cedula)+ " no se encuentra registrada.");
+}
+
 int main()
 {
 	Vuelo vuelo{};
@@ -145,6 +215,9 @@ int main()
 	menu+= "  2. Ver resumen de ingreso\n";
 	menu+= "  3. Buscar por nombre\n";
 	menu+= "  4. Mostrar resumen de asientos\n";
+	menu+= "  5. Mostrar pasajeros alfabeticamente\n";
+	menu+= "  6. Consular silla\n";
+	menu+= "  7. Cancelar tiquete por cedula\n";
 	menu+= "  0. Salir\n\n";
 	menu+= "opcion: ";
 	do{
@@ -154,6 +227,9 @@ int main()
 			case 2: mostrar_resumen_ingresos(vuelo); break;
 			case 3: buscar_por_nombre(vuelo); break;
 			case 4: mostrar_resumen_asientos(vuelo); break;
+			case 5: listar_pasajeros_alfabeticamente(vuelo); break;
+			case 6: mostrar_informacion_silla(vuelo); break;
+			case 7: cancelar_tiquete_por_cedula(vuelo); break;
 			case 0: cout<<"Saliendo...\n"; break;
 			default: cout<<"Opcion incorrecta.\n";
 		}

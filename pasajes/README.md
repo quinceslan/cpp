@@ -12,6 +12,9 @@ Octavio Paz compro la silla 3 en la fila 5.
 2. Conocer el valor recogido en la aerolínea por concepto de venta de tiquetes aéreos de la categoría preferencial y el valor recogido en la aerolínea por concepto de venta de tiquetes aéreos de la categoría general.
 3. Dado el nombre de una persona, decir la ubicación de su silla, por ejemplo si tiene el nombre Octavio Paz se debe decir que compró la silla 3 de la fila 5.
 4. Mostrar la información de todos los pasajeros en un solo mensaje de texto.
+5. Listar en un vector todos los nombres y ordenarlos alfabeticamente.
+6. Dado la ubicacion de la silla, mostrar la informacion del pasajero que compró el tiquete de esta silla.
+7. Cancelar la compra de un tiquete, dada la cédula del pasajero.
 
 ....
 
