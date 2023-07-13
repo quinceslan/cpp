@@ -2,28 +2,10 @@
 #define __MENU__HPP__
 
 #include "Scene.hpp"
+#include "Item.hpp"
 
 #include <functional>
 #include <vector>
-
-class Item: public sf::Text{
-public:
-    void setSelectColor(sf::Color select, sf::Color deselect= sf::Color::White);
-
-    void onMouseMove(sf::Event::MouseMoveEvent mouse);
-
-    void onMouseClick(sf::Event::MouseButtonEvent mouse);
-
-    void setTitle(const sf::String &title);
-
-    template<typename Fun>
-    void setCallBack(Fun fun){
-        callback= fun;
-    }
-private:
-    sf::Color select, deselect;
-    std::function<void(void)> callback;
-};
 
 class Menu: public Scene{
 public:
